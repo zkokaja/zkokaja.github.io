@@ -1,0 +1,55 @@
+---
+layout: post
+title: "Weekend Project: bpm"
+date: 2016-02-14 18:10:00
+categories: [project, tools]
+tags: [projects]
+---
+
+I recently read an
+[article](https://blog.cardiogr.am/2016/02/12/do-you-really-need-10000-steps-a-day-2/)
+about the origins of the "10,000 steps a day" idea. Why 10,000? It also examined
+how the number of steps you take correlate with overall health; the idea being
+to see if there's a correlation between number of steps and a lower *resting
+heart rate*.
+
+As someone without an Apple Watch or a similar device, I don't have a way to
+automatically add data to the phone's Health app to track my resting heart rate.
+So I decided to create an app that allows me to do just that.
+
+The idea is that the user would have the phone in one hand and the other hand
+measuring their pulse via the radial or carotid artery (see
+[here](http://www.webmd.com/heart/taking-a-pulse-heart-rate). With each pulse,
+the user taps on the phone. After a set numbers of pulses, the app displays the
+heart rate to the user and allows them to add it to the Health App.
+
+And in less than a day's work, I built this simple app! Let me show you
+screen-shots first: 
+
+1) The launch screen where you start tapping your pulse
+
+<img src="{{ site.url }}/images/2016-02-14-bpm-app-1.png" alt="Launch screen" 
+     class="center-image" width="350px" />
+
+2) After 15 beats, you get the options to add or try again
+
+<img src="{{ site.url }}/images/2016-02-14-bpm-app-2.png" alt="Add screen"
+     class="center-image" width="350px" />
+
+3) And just for fun, here's the verification:
+
+<img src="{{ site.url }}/images/2016-02-14-bpm-app-3.png" alt="Health screen"
+     class="center-image" width="350px" />
+
+I've written iOS apps before, but never in Swift (which is a fun language) and
+this is the first time I integrated with HealthKit. This is meant to be a
+stepping stone to move onto larger app projects I've been meaning to do - more
+utilities to make my life easier and hopefully others as well!
+
+I've read that the best time to measure resting heart rate is in the morning
+after you wake up. So now I have an easy way to do it without the laborious
+method of manually counting pulses in a specific interval, multiplying, and then
+manually adding that data point to Health.
+
+I will be uploading the source code to my GitHub account very soon.
+

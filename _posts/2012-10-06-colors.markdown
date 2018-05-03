@@ -1,0 +1,56 @@
+---
+layout: post
+title: Colors
+date: 2012-10-06 20:09:56 -04:00
+type: post
+published: true
+status: publish
+categories: [unix]
+tags: [awk]
+---
+
+I've been playing around with the Unix tool 'awk' for a week or two now, and
+it's been fun. I recommend everyone to learn it because it is an incredibly
+powerful tool. For an example, I'm going to show a simple program I wrote with
+it that searches for three color words ("red", "green", and "blue") in
+whatever file you give it; and it will show you how many instances there were,
+and where they were.
+
+So, here's the code:
+
+{% highlight bash %}
+#!/bin/bash
+awk '
+   BEGIN { printf "33[30m" }
+   {
+       if ($0 ~ / red /)
+       {
+            redSum++;
+            printf "33[41m"
+            print;
+            printf "33[47m"
+       }
+       else if ($0 ~ / blue /)
+       {
+            blueSum++;
+            printf "33[44m"
+            print;
+            printf "33[47m"
+       }
+       else if ($0 ~ / green /)
+       {
+            greenSum++;
+            printf "33[42m"
+            print;
+            printf "33[47m"
+       }
+    }
+
+    END { printf "33[47m"; printf "\nThere were %s reds, %s blues, %s greens\n", redSum, blueSum, greenSum; }
+' $1
+{% endhighlight %}
+
+And here's what it looks like:
+
+![colors]({{ site.url }}/images/colors.png)
+

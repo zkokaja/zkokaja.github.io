@@ -3,3 +3,70 @@
 ---
 
 @import "minima";
+
+.site-title {
+    font-size: 2rem;
+}
+
+.site-title:hover {
+    text-decoration: none 
+}
+
+.site-nav {
+    .page-link {
+        color: #828282;
+    }
+
+    .trigger a:hover {
+        text-decoration: none;
+    }
+}
+
+.profile {
+    float: left;
+    margin-right: 10px;
+
+    .site-logo {
+        float: left;
+        width: 50px;
+        height: 50px;
+        border: 3px solid #fff;
+        border-radius: 100%;
+    }
+}
+
+.post-title {
+    text-align: center;
+    font-size: 2rem;
+}
+
+.post-link {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.post-link:hover {
+    text-decoration: none;
+}
+
+.post-center {
+    margin-bottom: 15px;
+}
+
+.post-meta {
+    text-align: center;
+}
+
+.center-image {
+    margin: 0 auto;
+    display: block;
+}
+
+hr {
+    margin: 2rem;
+    border: 0;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #ccc;
+}
+

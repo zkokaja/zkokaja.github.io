@@ -1,0 +1,86 @@
+---
+layout: post
+title: "Keyboard Remotes"
+date: 2016-02-03 23:20:00
+categories: [project, tools]
+tags: [projects]
+---
+
+Smart TVs have become ubiquitous and they can play from a myriad of sources, which is great, but there's a small problem. They all come with different "keyboards" that we're supposed to use their hardware remote directional buttons to make our way through each letter of what we want to search. Typically it doesn't take long to find what you're looking for, but sometimes, just sometimes, it's infuriating.
+
+It's not just TVs, my blu-ray player does this as well as my TV. Luckily, we sometimes get apps on our phones that make this process simpler: just type in what you're searching for. You can imagine my excitement as I found an app for my smart blu-ray player. After downloading it and finding the player, it presented me with a digital form of the same hardware remote on my table.
+
+### The Idea
+
+This is when I got the idea to figure out how this app is sending the commands to the player. The process was fairly simple:
+
+1. Set up a proxy on laptop
+2. Capture packets via tcpdump
+3. Start the app and click a few buttons
+4. Stop the capture and analyze
+
+### The Research
+
+As it turns out, the packets are easily readable! Here's an important one:
+
+   IP 10.0.0... > 10.0.0...: Flags [P.], seq 0:249, ack 1, win 4117, options [nop,nop,TS val 992826933 ecr 1140600140],
+   length 249: HTTP: **GET http://10.0.0...:436/sendremotekey?%7B%22key%22%3A%22NFX%22%7D HTTP/1.1**
+
+And if we add -A to tcpdump, we can see the entire HTTP request:
+
+    ;-V5C.-LGET http://10.0.0...:436/sendremotekey?%7B%22key%22%3A%22NFX%22%7D
+    HTTP/1.1
+    Host: 10.0.0...:436
+    Accept-Encoding: gzip
+    User-Agent: Remote Control 2.0.0 rv:161 (iPhone; iPhone OS 8.1; en_US)
+    Connection: keep-alive
+    Proxy-Connection: keep-alive
+
+So let's look at the query parameters at the end of that URL. We just simply need to decode that, and we get:
+
+    {"key":"RET"}
+
+JSON! Now with Google's help, I found a [list](http://download.oppodigital.com/BDP103/BDP103_RS232_Protocol_v1.2.1.pdf) of commands that it accepts. Unfortunately it doesn't accept actual letters, but we can make this work with just the directional buttons.
+
+Side note: I tested this on a Roku as well and it does a similar thing! The app sends HTTP requests to the Roku, and it includes letters! So we don't need to do any fancy path finding.
+
+The last thing we need is the keyboard format we want to test this against. I chose the Netflix keyboard, which is a grid that looks like this:
+
+    a b c d e f
+    g h i j k l
+    m n o p q r
+    s t u v w x
+    u z 1 2 3 4
+    5 6 7 8 9 0
+
+### The Execution
+
+With all the information in hand, we can craft some software to do the heavy lifting for us. The essential problem we need to solve is this: given a string to search for, find the path from each letter to the next until the string is completed.
+
+We have five buttons in total to use: up, down, left, right, and enter. Each time we find a letter we press enter.
+
+The most challenging aspect is path finding. For this, I ended up using the A\* algorithm on a grid graph model I build from the keyboard layout. Once we have the path, it's simple. And the end result is this:
+
+    $ java -jar htremote.jar host port ahello
+    a->b EAST
+    b->h SOUTH
+    
+    h->b NORTH
+    b->c EAST
+    c->d EAST
+    d->e EAST
+    
+    e->f EAST
+    f->l SOUTH
+    
+    
+    l->k WEST
+    k->q SOUTH
+    q->p WEST
+    p->o WEST
+
+The first two arguments are the hostname and port to send the HTTP requests to and the third is the string we want to enter. 'a' is prefixed because it needs a starting position (which is typically 'a'). Then you can see the directions it takes. With each line it sends the GET request in that direction, and on new lines it sends an enter to actually select that letter. Which is why you see two new lines when it landed on 'l'.
+
+And of course if you want the source, it's available [here!](https://github.com/zkokaja/ht-remote).
+
+Z

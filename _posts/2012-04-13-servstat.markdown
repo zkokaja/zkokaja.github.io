@@ -1,0 +1,55 @@
+---
+layout: post
+title: Servstat
+date: 2012-04-13 01:32:27 -04:00
+type: post
+published: true
+status: publish
+categories: [ideas]
+tags: [ideas]
+---
+
+Here's a new project idea. I want to monitor my server's vitals in an easy and convenient way – ideally on my phone. I want diagnostic information like CPU load averages, RAM usage, File system stats, I/O usage, network speeds and anything else!
+
+So, the natural thing would be to look for someone who has done this. I've found that there are products that do this kind of thing, like PCMonitor. However, I really want to do this myself and I want all the features that I want. Also, I'm sure this will be useful to someone when I complete it.
+
+One feature I really want is to be able to get a complete report for a certain diagnostic, like RAM; but I also want to be able to 'subscribe' for a diagnostic, and have the server update me with ticks every minute or so. This should get you thinking of push/pull systems, and that what I want is really both in one. I want to pull certain diagnostics when I want them, or I want the server to push me the diagnostic at timed intervals.
+
+Let me add real quick as an aside: a very nice feature here would be authentication, possibly a Kerberos-like system. So, We'll have to design with that in mind for the future.
+
+This really splits the two components into connection-oriented and not. Classically broken into TCP and UDP. So, it would be natural to think of using an HTTP server for part of this (especially if you have one already set up). We can create a servlet that will take the request parameters and respond with the diagnostic. Since this is all done with a TCP connection, it will be very simple, especially with Java serialization. (Serialization and object-transport are really really cool!) Now, I know there are other ways of doing this, we can use SOAP or even RMI, but if we want to add other language support we can always marshal up the response to an XML doc before sending it.
+
+Now, the subscription part. We want it so that if the servlet receives a request for subscription, it will hand it off to some notifier that will take care of it. This notifier will keep track of who needs to be notified, and every interval quantum will wake up and notify everyone through UDP (push push push!). This is a quintessential place to use the observer pattern!
+
+Ok so let's throw some diagrams in here. We'll start with how a client will request a specific diagnostic:
+
+![sequence-get]({{ site.url }}/images/2012-04-13-sequence-get.png)
+
+Pretty simple, right? Ok how about when a client subscribes for notifications?
+
+![sequence-subscribe]({{ site.url }}/images/2012-04-13-sequence-subscribe.png)
+
+Cool! These two show us the three/four main components of the system. We have the client who will provide requests, the server who will handle and delegate responsibility, and the diagnostician that will do the heavy work. The component not represented (lost in the abstraction) is the Notifier. But he makes an appearance in a class diagram!
+
+![class-notifier]({{ site.url }}/images/2012-04-13-class-notifier.png)
+
+Alright, a bit more complex here. We have Notifier implementing the Runnable interface (you can't see it) because we want him to run in his own thread for obvious reasons – we may also need to use the singleton pattern since we'll only have class doing the notification. So, the Notifier will have an aggregate of observers who will know how to handle Diagnostic events; most notably the UDPObserver. This guy will take the Diagnostic, pack into a DatagramPacket, and push it out!
+
+Note: Notifier doesn't have an array of observers, just a generic collection for now (It will be a HashMap, mapping specific Diagnostic types with their observers). But, how will the Notifier get the diagnostics?
+
+![class-diag]({{ site.url }}/images/2012-04-13-class-diag.png)
+
+Ok. So what? Yes I have left of an important part of this. How are we getting our diagnostic information?? Well, This is where another library would be immensely helpful, and thankfully Hyperic has wrote one with bindings to many languages, primarily Java (I would not have wanted to write this!). The library is called [SIGAR](http://www.hyperic.com/products/sigar) which stands for System Information Gatherer and Reporter. Well that's done then :)
+
+One thing, BIG problem. SIGAR doesn't support OpenBSD, which is what I use on my server. So I will try to remedy when I have time (hopefully soon).
+
+The last thing we need to worry about is the actual servlet that wil be handling this, and actually that's pretty simple:
+
+![class-servlet]({{ site.url }}/images/2012-04-13-class-servlet.png)
+
+That's the nice thing about using J2EE, makes it easy!
+
+So now what I need from you guys is to give me some feedback as to what kind of features you think would be a great addition, and what you think of the overall project. The name isn't set in stone, just something I threw on, quick and dirty.
+
+Z
+

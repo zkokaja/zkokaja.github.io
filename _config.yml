@@ -1,20 +1,19 @@
-title: Your awesome title
-author: GitHub User
-email: your-email@domain.com
+title: Zaid Kokaja
+author: zkokaja
+email: 
 description: > # this means to ignore newlines until "twitter_username:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  Developer, Student, Consultant
 
 # social links
-twitter_username: jekyllrb
-github_username:  jekyll
 rss: rss
+#twitter_username: jekyllrb
+github_username:  zkokaja
+flickr_username: zkokaja
+linkedin_username: zkokaja
+
 # dribbble_username: jekyll
 # facebook_username: jekyll
-# flickr_username: jekyll
 # instagram_username: jekyll
-# linkedin_username: jekyll
 # pinterest_username: jekyll
 # youtube_username: jekyll
 # googleplus_username: +jekyll
@@ -27,7 +26,7 @@ rss: rss
 #   instance: example.com
 
 
-show_excerpts: false # set to true to show excerpts on the homepage
+show_excerpts: true # set to true to show excerpts on the homepage
 
 # Minima date format
 # refer to http://shopify.github.io/liquid/filters/date/ if you want to customize this
