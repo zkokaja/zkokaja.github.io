@@ -2,7 +2,7 @@
 
 This is my personal website and blog hosted on GitHub Pages.
 
-You can view the site at [zkokaja.github.io](zkokaja.github.io).
+You can view the site at [zkokaja.github.io](http://zkokaja.github.io).
 
 ## Locally
 
