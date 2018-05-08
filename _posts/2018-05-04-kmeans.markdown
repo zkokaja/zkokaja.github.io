@@ -6,9 +6,14 @@ categories: [cs, math, ml]
 tags: [math,cs,ml]
 ---
 
-A playful introduction and application to k-means in the spirit of Lewis
-Carroll. The Fox and the Hedgehog are looking at an image of the galaxies found
-by the [Hubble Telescope](https://www.spacetelescope.org/images/heic0406a/).
+A playful introduction and application to k-means in the spirit of [Lewis
+Carroll][1], [Plato][2], and [Hofstadter][3]: using a conversation to explain a
+concept. I've chosen to use a Fox and a Hedgehog as the actors in this
+conversation: motivated by Archilochus' [quote][5]: 
+> The fox knows many things; the hedgehog one big thing.
+
+The Fox and the Hedgehog are looking at an
+image of the galaxies found by the [Hubble Telescope][4].
 
 <img src='/images/2018-kmeans-heic1.png' class='center-image' width="500px" alt="Hubble"/>
 
@@ -50,7 +55,8 @@ let's place them randomly on our graph:
 <img src='/images/2018-kmeans-2.png' class='center-image' width="400px"
 alt="Three clusters of points on a 2D plot."/>
 
-They are our means.
+They are our means. Note that we used k=3 pine cones here because we know
+beforehand how our pebbles are structured.
 
 _Fox_: The means of each cluster? But they're nowhere close to their centers!
 
@@ -131,7 +137,7 @@ This is pretty picture. However, it's likely our 10,000 means _overfit_ the
 data, meaning that most of our points had a corresponding mean to explain them.
 Nevertheless, it could be due to the low resolution of our image that there just
 weren't as many bright pixels. Or the way which we processed the image
-initially. We have roughly 15,000 data points to begin with, so maybe we should
+initially. Our original image had roughly 15,000 bright pixels, so maybe we should
 choose a smaller k.
 
 _Fox_: That makes sense. How about a third of it, 5,000 means?
@@ -147,9 +153,9 @@ galaxies in the original picture.
 
 _Hedgehog_: Indeed, if we had a larger picture, we would have more data points,
 thus the galaxies even farther away can be represented. And with a more general
-algorithm like EM we could represent clusters with as a Gaussian, so we would
-have a estimate variance as well. Maybe for next time, but for now I think you
-have a good idea of k-means, Fox!
+algorithm like EM we could represent clusters with a Gaussian, so we would
+estimate variance in addition to the mean. Maybe for next time, but for now I
+think you have a good idea of k-means, Fox!
 
 ---
 
@@ -159,9 +165,9 @@ I realize this algorithm may not be the ideal choice for the problem I'm
 presenting here, but I think it's a interesting problem and gives me the
 opportunity to discuss it in an fun way.
 
-I wanted to share some of the code I used for the post. This is a non-vectorized
-implementation because it's easier to understand as an introduction. Here is the
-assignment step:
+I wanted to share some of the Python code I used for the post. This is a
+non-vectorized implementation because it's easier to understand as an
+introduction. Here is the assignment step:
 
 ```python
 def assign(x, mu, k):
@@ -243,3 +249,8 @@ plt.scatter(mus[:,0], mus[:,1], s=1, c='r', alpha=1);
 plt.show()
 ```
 
+[1]: https://en.wikipedia.org/wiki/What_the_Tortoise_Said_to_Achilles
+[2]: https://en.wikipedia.org/wiki/Plato#Dialogues
+[3]: https://en.wikipedia.org/wiki/G%C3%B6del,_Escher,_Bach
+[4]: https://www.spacetelescope.org/images/heic0406a/
+[5]: https://en.wikipedia.org/wiki/Archilochus#Quotes
