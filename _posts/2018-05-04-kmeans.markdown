@@ -9,7 +9,7 @@ tags: [math,cs,ml]
 A playful introduction and application to k-means in the spirit of [Lewis
 Carroll][1], [Plato][2], and [Hofstadter][3]: using a conversation to explain a
 concept. I've chosen to use a Fox and a Hedgehog as the actors in this
-conversation: motivated by Archilochus' [quote][5]: 
+conversation, motivated by Archilochus' [quote][5]: 
 > The fox knows many things; the hedgehog one big thing.
 
 The Fox and the Hedgehog are looking at an
