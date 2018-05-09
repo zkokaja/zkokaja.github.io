@@ -96,10 +96,10 @@ converge to the cluster centroids.
 _Fox_: Very cool. This sounds like a useful algorithm. But how does it apply to
 our picture problem?
 
-_Hedgehog_: It is very useful and appears in many fields, including signal
-processing and image processing (compression, segmentation). Now, for our
-picture, we can think of each bright pixel as a pebble, and we want to find the
-means of as many as we can.
+_Hedgehog_: It is very useful and appears in many fields: machine learning,
+signal processing, and image processing (compression, segmentation). Now, for
+our picture, we can think of each bright pixel as a pebble, and we want to find
+the means of as many as we can.
 
 _Fox_: I see, but how many pine cones do we choose, and how do we place them? It
 seems like there are a lot of different sized galaxies.
