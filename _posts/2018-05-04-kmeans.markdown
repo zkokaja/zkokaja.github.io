@@ -23,7 +23,7 @@ image of the galaxies found by the [Hubble Telescope][4].
 <img src='/images/2018-kmeans-heic1.png' class='center-image' width="500px" alt="Hubble"/>
 
 <script
-src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 type="text/javascript"></script>
 
 _Fox_: That is one of my favorite pictures. Did you know that they pointed the
