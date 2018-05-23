@@ -4,17 +4,53 @@ title: "Optimization, Happiness, and Entropy"
 date: 2017-12-28 18:10:00
 categories: [math, cs, life]
 tags: [math,cs,life]
+customjs:
+  - https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/function-plot/1.18.1/function-plot.js
 ---
 
+<img src='/images/thumb_3ds.png' width="200px" 
+     style='float:left; padding-right: 10px' 
+     alt="Cartoon image of fox and hedgehog."/>
 It's not often that a topic formed in mathematics and leveraged in computer
 science finds itself relevant to our every day lives. We can, however, gain some
 wisdom from a brief look into [optimization][3]. This is not optimization in the
 sense of increasing efficiency, but rather is concerned with finding maximums 
 or minimums of functions.
+<br style='clear:both;' />
 
-Let's consider the graph for the quadratic function *−x^2 + 5x + 4*:
+<script>
+window.onload = function() {
 
-<img src='/images/2017-12-28-octplot1.png' class='center-image' width="500px" alt="One Maximum"/>
+    functionPlot({
+        target: '#plot1',
+        data: [{
+        fn: '-x^2+1',
+        derivative: {
+                fn: '-2x',
+                updateOnMouseMove: true
+            }
+        }],
+        xAxis: {domain: [-4,4]},
+        yAxis: {domain: [-2,2]},
+    });
+
+    functionPlot({
+        target: '#plot2',
+        data: [{
+            fn: '-(x^2+x-1)*(x^2+4x+3)',
+            graphType: 'polyline'
+        }],
+        xAxis: {domain: [-4,2]},
+        yAxis: {domain: [-2,5]},
+    });
+}
+</script>
+
+Let's consider the graph for a quadratic function:
+
+<div id="plot1" style="display:inline-block; width:100%; text-align:center;">
+</div>
 
 Imagine we would like to explain to the computer how to find the maximum value
 for this function. For us it couldn't be simpler, we can see where it tops off;
@@ -30,11 +66,10 @@ algorithm, you feel which direction is 'up', move that way, and repeat until
 everything around you is descending.
 
 But do you sense a problem with this approach? If so, you are correct. Consider
-two hills in close proximity, or a function such as
-*-(x^2 + x - 1)(x^2 + 4x + 3)*:
+two hills in close proximity, or a function such as:
 
-<img src='/images/2017-12-28-octplot2.png' class='center-image' width="500px" 
-     alt="Multiple Maximum"/>
+<div id="plot2" style="display:inline-block; width:100%; text-align:center;">
+</div>
 
 If we begin at the leftmost point and move upward as before, we reach the first
 hill thinking it's the highest peak. Only to realize there's a higher one to the
