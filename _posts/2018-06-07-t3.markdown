@@ -1,0 +1,322 @@
+---
+layout: post
+title: "T3: a self-taught Tic-tac-toe agent"
+date: 2018-06-07 00:00:00.000000000 -04:00
+type: post
+published: true
+status: publish
+categories: [machine learning]
+tags: [cs,machine learning]
+customjs:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+---
+
+<img src='/images/t3.png' width="200px" 
+     style='float:left; padding-right: 10px' 
+     alt="TicTacToe board."/>
+I recently watched the [AlphaGo][1] documentary with my family and we were
+amazed with the capabilities of the AI that DeepMind built. My family was very
+curious about how it was capable of such a feat, and prodded me over dinner to
+explain it - since I'm getting my MS in machine learning. I tried my best at an
+explanation, but I want to take this chance to provide an intuitive
+understanding of the fundamentals of this domain. In search for a good example,
+I decided to build a tic-tac-toe agent that learns to play the game well by
+itself.
+<br style='clear:both;' />
+
+__TL;DR__: RL is awesome, play the agent [here](#play).
+
+There are three major part of machine learning, and I want to mention each
+briefly so we get an idea of where this domain lies:
+
+1. *Supervised Learning:* probably the most intuitive and well-known, this area
+   is concerned with approximating functions. For example, we can give an
+   algorithm a lot x and y pairs, and it will learn that function. The input can
+   be anything: for example, an image; and its output can be a label of what
+   the image is (e.g. a cat!).
+
+2. *Unsupervised Learning:* these algorithms are what you use if you have a lot
+   of data, but no labels. All the x's but no y's. They can tell you about any
+   underlying structure of your data, and if your data is made up of parts, they
+   can tell you which parts are the most influential.
+
+3. *Reinforcement Learning:* finally, the topic we're interested in for this
+   post. This is most easily thought of as decision making: we want an agent to
+   learn how to make good decisions in a particular environment. Let's dive into
+   this some more.
+
+---
+
+## Reinforcement Learning
+
+We need to begin with some definitions. The most important is the __model__ which
+is defined by what is called a Markov Decision Process. Let's just call it $$M$$
+and define it by its parts. First, it has a set of states, $$s \in S$$; where a
+state can be described according to your specific need. Next, we need a set of
+actions which allow us to transition from state to state, $$a \in A$$.
+Performing an action may not always be successful - e.g. a robot who's tire
+slips, keeping it in the same location. So, we define a function that gives us
+the probability of transitioning from state s to s' by taking action a:
+$$T(s,a,s')$$.
+
+Finally, and most importantly, we need to __reward__ our agent for doing what we
+want it to do - otherwise how will it know what to do? Incidently this has a
+corollary in animal behavior (how do you train your dog? Why do you do things
+that feel good?). Back to the model, though, we can represent this
+reward signal as a function $$R(s,a)$$, similar to the transition function.
+
+Alright, so we have a way to model our problem, but how does it learn _what to
+do_? This is the second piece of the puzzle. We need a way to measure how good a
+state is, or a way to gauge the quality of taking an action in some state. If we
+know this about our states, we know which states we want to move toward in
+general. Luckily Bellman did the hard work for us and found a simple way to
+represent it.
+
+In English, the definition is: the value of a state is the reward for being in
+the state and taking an action, plus the discounted sum of rewards of the future
+states when acting optimally. Spend a minute if you need to, but it shouldn't
+take much convincing to realize that it makes sense at an intuitive level - how
+good a state is, is equal to its reward and acting optimally afterwards.
+We say "discounted" future rewards because it gives us a way to control how
+important immediate rewards are versus future rewards. Mathematically, the
+definition is:
+
+$$Q(s,a) = R(s,a) + \gamma \underset{a'}{max}\underset{s'}{\sum{}}T(s,a,s')Q(s',a')$$
+
+Let's unpack this a bit. $$Q(s,a)$$ refers to the quality of taking action a in
+state s. $$\gamma$$ is the discounting factor, and can be thought of as a
+parameter into the model. Then, we want to choose the action in the next state
+that maximizes our current approximation of it. In other words, the quality of
+the state/action that is highest.
+
+From this function we can define the __policy__, or the mapping between states
+and action. Basically, the agent can look up the state in the policy and know
+what action to take. This is another function, $$\pi(s) \rightarrow a$$ and can
+be defined in terms of $$Q$$ simply as:
+
+$$\pi(s) = \underset{a \in A}{\operatorname{argmax}}Q(s,a)$$
+
+In short: when in state s, take the action with the maximum Q-value. Now we're
+ready for the last and third piece of this puzzle. Take notice that in our
+definition of the Q function, we relied on the transition function to tell us
+the likelihood of moving from one state to another. Practically, this is not
+easy to define for real world applications. So, with the power of statistics and
+the law of large numbers, we can rewrite our function as:
+
+$$Q(s,a) \overset{\alpha}{\leftarrow} R(s,a) + \gamma \underset{a'}{max}Q(s',a')$$
+
+Where $$\alpha$$ is a learning-rate parameter which modifies the previous
+estimate by a fraction of the new value. Essentially we're updating our
+approximation for the quality of a state is. If we do this often enough
+(theoretically infinitely many times), then we converge onto the _true_
+Q-values.
+
+Now this equation we can employ in an algorithm. It's helpful to think of the agent
+interacting with the environment on a step by step basis:
+
+1. Agent starts in state s
+1. Agent chooses an action a and performs it
+1. Environment rewards agent with reward r
+1. Agent is now in some state s'
+1. Agent updates Q(s,a) based on {s,a,r,s'}
+
+So, we can train the agent by simulating many of these interactions, until we
+end with a policy that works well. One very important point though: how the
+agent chooses an action (step 2) is crucial. If the agent always chooses the
+best action (greedy), then it may not ever try other actions that are even
+better! This is a fundamental trade-off in reinforcement learning, and it's
+called the exploration-exploitation dilemma. How much do we explore versus
+leveraging what we know works?
+
+You may be wondering what would happen if the agent encounters a state it has
+not seen before. This is a critical aspect of this domain because most
+applications have an enormous state space. The current solutions involve
+training a neural network to approximate the function Q. Neural networks can
+generalize quite well to unseen input by learning features of the states it has
+been trained on. This combination of reinforcement learning and supervised
+learning is how we can get powerful results.
+
+One interesting side note I'd like to mention. Researchers trained a Backgammon
+agent back in 1992 in a similar approach to this, but attempted to supplement
+the learner with expert features (e.g. what a good position may look like).
+However, they found out later that training without any "hints" created a more
+powerful agent. This really outlines the network's ability to learn their own
+features. We even saw a similar thing happen with AlphaGo: it was initially
+trained on example of professional players. The researchers eventually left that
+idea and trained exclusively on self-play games; which again, created a better
+agent!
+
+---
+
+# T3<a name="play"></a>
+
+Before we continue, take a moment and play against the trained agent. Try to
+find any flaws in its strategy - I cut the training short so there's still a
+chance to win!
+
+<style>
+{% include_relative t3/t3.css %}
+</style>
+<script>
+{% include_relative t3/t3.js %}
+
+window.onload = function() {
+    fnLoad();
+}
+</script>
+
+{% include_relative t3/t3.html %}
+
+Pretty cool, right? Let's apply the math to the problem at hand: tic-tac-toe.
+First, let's figure out our model:
+
+- __States__: A state in T3 is a unique board configuration.
+- __Actions__: An action is a placement of an X or O on an open spot.
+- __Rewards__: A reward of +1 is awarded if agent wins as X, 0 otherwise.
+
+This should seem quite rational. By assigning the rewards this way, each value
+of a state will tell us the probability that X will win. So, the policy is
+defined as choosing actions that maximize this probability when playing as X,
+and minimize it when playing as O.
+
+Let's walk through some of the Python code. First, we need to define what a
+board is, and some helper functions:
+
+```python
+def get_board(n=3):
+    return np.zeros((n,n), np.int8)
+
+def get_moves(board):
+    return np.where(board == 0)
+
+def play_move(board, move, turn):
+    board[move] = turn
+    return board
+
+def game_won(board):
+    n,_  = board.shape
+    cols = board.sum(axis=0)
+    rows = board.sum(axis=1)
+    diag = [board.trace(), np.fliplr(board).trace()]
+    
+    if n in cols or n in rows or n in diag:
+        return X_WON
+    if -n in cols or -n in rows or -n in diag:
+        return X_LOST
+    if not np.any(board == 0):
+        return X_DRAW
+    
+    return 0
+```
+
+This simply defines state/board as a nxn NumPy integer array. We use a convention
+of 1 for X and -1 for O. This way, it's trivial to check which moves are
+available and whether the game has ended.
+
+Then we come upon the first critical function: choosing an action. As we
+mentioned, we want a strategy that will allow us to explore the state space, but
+at the same time exploit good moves so the agent becomes more confident in its
+approximations. In this example, we use an $$\epsilon$$-greedy approach. The idea
+is that with probability $$\epsilon$$ the agent will choose a random action,
+otherwise it will maximize or minimize the possible moves on the given board.
+Note, we use a dictionary Q to store the values of each state/action pair.
+
+```python
+def choose_move(Q, board, epsilon, turn, default_q=0):
+    X,Y  = get_moves(board)
+    a = None
+
+    if epsilon != 0 and np.random.rand() < epsilon:       
+        i = np.random.randint(0, X.size)
+        a = (X[i],Y[i])
+        q_a = Q.get(encode(board,a))
+        if q_a is None: q_a = default_q
+        return a, q_a
+    
+    if turn == 1:
+        maximize = True
+        best_q   = -np.inf
+    else:
+        maximize = False
+        best_q   = np.inf
+    
+    for move in zip(X,Y):
+        q_a = Q.get(encode(board,move))
+        if q_a == None: q_a = default_q
+        
+        if maximize and q_a > best_q:
+            best_q = q_a
+            a = move
+        elif not maximize and q_a < best_q:
+            best_q = q_a
+            a = move
+            
+    return a, best_q
+```
+
+And finally, the main function is simply to play a game and update our Q-values.
+By performing this repeatedly, we will converge onto some near-optimal Q which 
+we can use for playing against. Notice that this method holds the same pattern
+of steps we describe earlier, about how an agent interacts with the environment.
+
+```python
+def play_game(Q, alpha=.1, gamma=1, epsilon=.1, q_init=0.5):
+    won = 0
+    reward = 0
+    turn = 1
+    x = get_board()
+        
+    while won == 0:
+        # Agent is in state x, chooses an action a
+        a,_ = choose_move(Q, x, epsilon, turn)
+        s = encode(x,a)
+        
+        # We're in new state y
+        y = play_move(x, a, turn)
+
+        # Environment rewards with r
+        r = 0
+        q_y = 0
+        won = game_won(y)
+        if won == 0:
+            _,q_y = choose_move(Q, y, epsilon, -turn)
+        elif won == X_WON:
+            r = +1.0
+        elif won == X_LOST:
+            r = 0.0
+        elif won == X_DRAW:
+            r = 0.0
+
+        q = Q.get(s)
+        q = q if q is not None else q_init
+        
+        # Update Q-value
+        Q[s] = q + alpha*(r + gamma*q_y - q)
+
+        reward += r
+        turn = -turn
+        x = y
+         
+    return won,reward
+```
+
+## Next Steps
+
+I would like to take this a step further by replacing the Q dictionary with a
+neural network, and by increasing the board size to, say, 13x13. This way, we
+can test the network's generalization ability and have fun playing on a larger
+board.
+
+It's also essential to have a performance metric, so we can see how much
+learning is progressing - or not. One idea would be to hand-design a simple
+agent that our learning agent plays against. Another would be to use a previous
+version of the agent as the opponent. This would also allow us to plot graphs
+showing this metric against number of trained games.
+
+## Acknowledgements
+
+The Javascript version of the game is based on an anonymous Codepen design
+[here][2].
+
+[1]: https://deepmind.com/blog/alphago-zero-learning-scratch/
+[2]: https://codepen.io/anon/pen/vBJhH
